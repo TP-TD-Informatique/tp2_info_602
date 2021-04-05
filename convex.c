@@ -36,6 +36,11 @@ GtkWidget *creerIHM(Contexte *pCtxt);
 gboolean diskRandom(GtkWidget *widget, gpointer data);
 
 /**
+ * Génère un certain nombre de points distribués aléatoirement dans un losange
+ */
+gboolean losangeRandom(GtkWidget *widget, gpointer data);
+
+/**
     Cette réaction est appelée à la création de la zone de dessin.
 */
 gboolean realize_evt_reaction(GtkWidget *widget, gpointer data);
@@ -124,6 +129,7 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     GtkWidget *hbox1;
     GtkWidget *button_quit;
     GtkWidget *button_disk_random;
+    GtkWidget *button_losange_random;
 
     /* Crée une fenêtre. */
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -158,8 +164,15 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     // Créé l'entrée texte pour le nombre de points à rajouter
     pCtxt->points_entry = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(pCtxt->points_entry), "100");
+    // Créé le bouton losange
+    button_losange_random = gtk_button_new_with_label("Points aléatoire dans losange");
+    // Connecte la réaction losangeRandom à l'évenement 'click'
+    g_signal_connect(button_losange_random, "clicked",
+                     G_CALLBACK(losangeRandom),
+                     pCtxt);
     // Ajoute les éléments à la vue
     gtk_container_add(GTK_CONTAINER(vbox2), button_disk_random);
+    gtk_container_add(GTK_CONTAINER(vbox2), button_losange_random);
     gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->points_label);
     gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->points_entry);
     // Crée le bouton quitter.
@@ -183,16 +196,44 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
 gboolean diskRandom(GtkWidget *widget, gpointer data) {
     Contexte *pCtxt = (Contexte *) data;
     TabPoints *ptrP = &(pCtxt->P);
-    printf("diskRandom\n");
     int nbPoints;
     char *str = (char *) gtk_entry_get_text(GTK_ENTRY(pCtxt->points_entry));
     sscanf(str, "%d", &nbPoints);
+    printf("diskRandom %d\n", nbPoints);
     for (int i = 0; i < nbPoints; ++i) {
         Point p;
         do {
             p.x = 2.0 * (rand() / (double) RAND_MAX) - 1.0;
             p.y = 2.0 * (rand() / (double) RAND_MAX) - 1.0;
         } while ((p.x * p.x + p.y * p.y) > 1.0);
+        TabPoints_ajoute(ptrP, p);
+    }
+    gtk_widget_queue_draw(pCtxt->drawing_area);
+
+    char nb[100];
+    sprintf(nb, "%d", ptrP->nb);
+    gtk_label_set_text(GTK_LABEL(pCtxt->points_label), nb);
+
+    return TRUE;
+}
+
+gboolean losangeRandom(GtkWidget *widget, gpointer data) {
+    Contexte *pCtxt = (Contexte *) data;
+    TabPoints *ptrP = &(pCtxt->P);
+    int nbPoints;
+    char *str = (char *) gtk_entry_get_text(GTK_ENTRY(pCtxt->points_entry));
+    sscanf(str, "%d", &nbPoints);
+    printf("losangeRandom %d\n", nbPoints);
+    for (int i = 0; i < nbPoints; ++i) {
+        Point p;
+        p.x = 2.0 * (rand() / (double) RAND_MAX) - 1.0;
+        p.y = 2.0 * (rand() / (double) RAND_MAX) - 1.0;
+
+        double x = (p.x + p.y) * (sqrt(2.0) / 4.0);
+        double y = (-p.x + p.y) * (sqrt(2.0) / 4.0);
+        p.x = x;
+        p.y = y;
+
         TabPoints_ajoute(ptrP, p);
     }
     gtk_widget_queue_draw(pCtxt->drawing_area);
