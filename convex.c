@@ -15,6 +15,8 @@ typedef struct SContexte {
     int width;
     int height;
     GtkWidget *drawing_area;
+    GtkWidget *points_entry;
+    GtkWidget *points_label;
     TabPoints P;
 } Contexte;
 
@@ -151,7 +153,15 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     g_signal_connect(button_disk_random, "clicked",
                      G_CALLBACK(diskRandom),
                      pCtxt);
+    // Créé le label pour le nombre de points totaux
+    pCtxt->points_label = gtk_label_new("0");
+    // Créé l'entrée texte pour le nombre de points à rajouter
+    pCtxt->points_entry = gtk_entry_new();
+    gtk_entry_set_text(GTK_ENTRY(pCtxt->points_entry), "100");
+    // Ajoute les éléments à la vue
     gtk_container_add(GTK_CONTAINER(vbox2), button_disk_random);
+    gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->points_label);
+    gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->points_entry);
     // Crée le bouton quitter.
     button_quit = gtk_button_new_with_label("Quitter");
     // Connecte la réaction gtk_main_quit à l'événement "clic" sur ce bouton.
@@ -174,7 +184,10 @@ gboolean diskRandom(GtkWidget *widget, gpointer data) {
     Contexte *pCtxt = (Contexte *) data;
     TabPoints *ptrP = &(pCtxt->P);
     printf("diskRandom\n");
-    for (int i = 0; i < 10; ++i) {
+    int nbPoints;
+    char *str = (char *) gtk_entry_get_text(GTK_ENTRY(pCtxt->points_entry));
+    sscanf(str, "%d", &nbPoints);
+    for (int i = 0; i < nbPoints; ++i) {
         Point p;
         do {
             p.x = 2.0 * (rand() / (double) RAND_MAX) - 1.0;
@@ -183,6 +196,10 @@ gboolean diskRandom(GtkWidget *widget, gpointer data) {
         TabPoints_ajoute(ptrP, p);
     }
     gtk_widget_queue_draw(pCtxt->drawing_area);
+
+    char nb[100];
+    sprintf(nb, "%d", ptrP->nb);
+    gtk_label_set_text(GTK_LABEL(pCtxt->points_label), nb);
 
     return TRUE;
 }
