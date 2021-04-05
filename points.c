@@ -40,3 +40,19 @@ void TabPoints_agrandir(TabPoints *tab) {
     tab->taille += 100;
     tab->points = realloc(tab->points, sizeof(Point) * tab->taille);
 }
+
+int TabPoints_indexBasGauche(TabPoints *tab) {
+    int res = tab->nb > 0 ? 0 : -1;
+
+    for (int i = 1; i < tab->nb; ++i) {
+        Point m = TabPoints_get(tab, res); // Point minimum
+        Point a = TabPoints_get(tab, i); // Point actuel
+
+        // Si a est sous m ou si a est au même niveau que m et plus à gauche
+        if (a.y > m.y || (a.y == m.y && a.x < m.x)) {
+            res = i;
+        }
+    }
+
+    return res;
+}

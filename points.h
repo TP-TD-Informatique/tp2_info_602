@@ -65,4 +65,11 @@ void TabPoints_termine(TabPoints *tab);
  */
 void TabPoints_agrandir(TabPoints *tab);
 
+/**
+ * Recherche l'indice du point le plus en bas à gauche
+ * @param tab un pointeur vers une structure TabPoint valide
+ * @return l'indice du point
+ */
+int TabPoints_indexBasGauche(TabPoints *tab);
+
 #endif
