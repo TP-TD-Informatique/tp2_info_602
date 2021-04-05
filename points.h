@@ -1,6 +1,8 @@
 #ifndef _POINTS_H_
 #define _POINTS_H_
 
+#include <math.h>
+
 typedef struct SPoint {
     double x;
     double y;
@@ -71,5 +73,11 @@ void TabPoints_agrandir(TabPoints *tab);
  * @return l'indice du point
  */
 int TabPoints_indexBasGauche(TabPoints *tab);
+
+/**
+ * Tri le tableau selon l'angle polaire par rapport au premier point
+ * @param tab un pointeur vers une structure TabPoint valide
+ */
+void TabPoints_triSelonT0(TabPoints *tab);
 
 #endif

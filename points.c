@@ -56,3 +56,49 @@ int TabPoints_indexBasGauche(TabPoints *tab) {
 
     return res;
 }
+
+/**
+ * Calcule l'angle polaire de b par rapport à a
+ * @param a un Point
+ * @param b un autre Point
+ * @return l'angle entre les 2 points
+ */
+double anglePolaire(Point *a, Point *b) {
+    double longueur = b->x - a->x;
+    double hauteur = b->y - a->y;
+
+    double adj = longueur;
+    double hyp = sqrt((longueur * longueur) + (hauteur * hauteur));
+
+    return acos(adj / hyp);
+}
+
+/**
+ * Renvoie 1 si a a un plus grand angle que b par rapport à r
+ * Renvoie 0 si ils ont le même angle
+ * Renvoie -1 si a a un angle plus petit que b par rapport à r
+ * @param a un Point
+ * @param b un autre Point
+ * @param r le point de référence
+ * @return -1|0|1
+ */
+int comp(const void *a, const void *b, const void* r) {
+    Point *pa = (Point *) a;
+    Point *pb = (Point *) b;
+    Point *pr = (Point *) r;
+
+    double angleA = anglePolaire(pr, pa);
+    double angleB = anglePolaire(pr, pb);
+
+    if (angleA == angleB) {
+        return 0;
+    } else if (angleA < angleB) {
+        return -1;
+    } else {
+        return 1;
+    }
+}
+
+void TabPoints_triSelonT0(TabPoints *tab) {
+    qsort_r(tab->points, tab->nb, sizeof(Point), comp, tab->points[0]);
+}
