@@ -59,4 +59,10 @@ int TabPoints_nb(TabPoints *tab);
  */
 void TabPoints_termine(TabPoints *tab);
 
+/**
+ * Augmente la taille du tableau de points de 100
+ * @param tab un pointeur vers une structure TabPoint valide
+ */
+void TabPoints_agrandir(TabPoints *tab);
+
 #endif

@@ -9,8 +9,10 @@ void TabPoints_init(TabPoints *tab) {
 }
 
 void TabPoints_ajoute(TabPoints *tab, Point p) {
-    if (tab->nb < tab->taille)
-        tab->points[tab->nb++] = p;
+    if (tab->nb == tab->taille)
+        TabPoints_agrandir(tab);
+
+    tab->points[tab->nb++] = p;
 }
 
 void TabPoints_set(TabPoints *tab, int i, Point p) {
@@ -32,4 +34,9 @@ void TabPoints_termine(TabPoints *tab) {
     tab->taille = 0;
     tab->nb = 0;
     tab->points = NULL;
+}
+
+void TabPoints_agrandir(TabPoints *tab) {
+    tab->taille += 100;
+    tab->points = realloc(tab->points, sizeof(Point) * tab->taille);
 }
