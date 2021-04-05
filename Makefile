@@ -7,7 +7,7 @@ LIBS=-lm
 GTKCFLAGS:=-g $(shell pkg-config --cflags gtk+-2.0)
 GTKLIBS:=$(shell pkg-config --libs gtk+-2.0)
 
-all: convex
+all: convex cleanO
 
 convex: convex.o points.o pile.o
 	$(LD) convex.o points.o pile.o $(GTKLIBS) $(LIBS) -o convex
@@ -26,3 +26,6 @@ clean:
 
 fullclean: clean
 	rm -f *~ *.fig.bak
+
+cleanO:
+	rm -f *.o

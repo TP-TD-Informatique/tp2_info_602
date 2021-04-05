@@ -82,7 +82,7 @@ double anglePolaire(Point *a, Point *b) {
  * @param r le point de référence
  * @return -1|0|1
  */
-int comp(const void *a, const void *b, const void* r) {
+int comp(const void *a, const void *b, const void *r) {
     Point *pa = (Point *) a;
     Point *pb = (Point *) b;
     Point *pr = (Point *) r;
@@ -101,4 +101,14 @@ int comp(const void *a, const void *b, const void* r) {
 
 void TabPoints_triSelonT0(TabPoints *tab) {
     qsort_r(tab->points, tab->nb, sizeof(Point), comp, tab->points[0]);
+}
+
+void TabPoints_echange(TabPoints *tab, int i, int j) {
+    Point t = tab->points[i];
+    tab->points[i] = tab->points[j];
+    tab->points[j] = t;
+}
+
+int estAGauche(Point a, Point b, Point r) {
+    return comp(&a, &b, &r) > 0;
 }

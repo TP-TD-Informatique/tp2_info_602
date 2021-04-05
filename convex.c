@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <gtk/gtk.h>
 #include "points.h"
+#include "pile.h"
 
 //-----------------------------------------------------------------------------
 // Déclaration des types
@@ -18,6 +19,7 @@ typedef struct SContexte {
     GtkWidget *points_entry;
     GtkWidget *points_label;
     TabPoints P;
+    PilePoints pile;
 } Contexte;
 
 
@@ -39,6 +41,11 @@ gboolean diskRandom(GtkWidget *widget, gpointer data);
  * Génère un certain nombre de points distribués aléatoirement dans un losange
  */
 gboolean losangeRandom(GtkWidget *widget, gpointer data);
+
+/**
+ * Effectue le balayage de Graham sur les points
+ */
+gboolean graham(GtkWidget *widget, gpointer data);
 
 /**
     Cette réaction est appelée à la création de la zone de dessin.
@@ -65,6 +72,14 @@ Point point2DrawingArea(Point p, Contexte *pCtxt);
    @param p un point dans la zone de dessin.
  */
 void drawPoint(cairo_t *cr, Point p);
+
+/**
+ * Dessine la ligne entre p et q
+ * @param cr le contexte cairo pour dessiner
+ * @param p un Point
+ * @param q un autre Points
+ */
+void drawLine(cairo_t *cr, Point p, Point q);
 
 //-----------------------------------------------------------------------------
 // Programme principal
@@ -121,6 +136,13 @@ void drawPoint(cairo_t *cr, Point p) {
     cairo_fill(cr);
 }
 
+void drawLine(cairo_t *cr, Point p, Point q) {
+    cairo_move_to(cr, p.x, p.y);
+    cairo_line_to(cr, q.x, q.y);
+    cairo_stroke(cr);
+}
+
+
 /// Charge l'image donnée et crée l'interface.
 GtkWidget *creerIHM(Contexte *pCtxt) {
     GtkWidget *window;
@@ -130,6 +152,7 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     GtkWidget *button_quit;
     GtkWidget *button_disk_random;
     GtkWidget *button_losange_random;
+    GtkWidget *button_graham;
 
     /* Crée une fenêtre. */
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -170,11 +193,18 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     g_signal_connect(button_losange_random, "clicked",
                      G_CALLBACK(losangeRandom),
                      pCtxt);
+    // Créé le bouton graham
+    button_graham = gtk_button_new_with_label("Enveloppe convexe (Graham)");
+    // Connecte la réaction graham à l'évenement 'click'
+    g_signal_connect(button_graham, "clicked",
+                     G_CALLBACK(graham),
+                     pCtxt);
     // Ajoute les éléments à la vue
     gtk_container_add(GTK_CONTAINER(vbox2), button_disk_random);
     gtk_container_add(GTK_CONTAINER(vbox2), button_losange_random);
     gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->points_label);
     gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->points_entry);
+    gtk_container_add(GTK_CONTAINER(vbox2), button_graham);
     // Crée le bouton quitter.
     button_quit = gtk_button_new_with_label("Quitter");
     // Connecte la réaction gtk_main_quit à l'événement "clic" sur ce bouton.
@@ -241,6 +271,39 @@ gboolean losangeRandom(GtkWidget *widget, gpointer data) {
     char nb[100];
     sprintf(nb, "%d", ptrP->nb);
     gtk_label_set_text(GTK_LABEL(pCtxt->points_label), nb);
+
+    return TRUE;
+}
+
+gboolean graham(GtkWidget *widget, gpointer data) {
+    Contexte *pCtxt = (Contexte *) data;
+    TabPoints *ptrT = &(pCtxt->P);
+    PilePoints *ptrP = &(pCtxt->pile);
+
+    printf("Graham\n");
+
+    int index = TabPoints_indexBasGauche(ptrT);
+    TabPoints_echange(ptrT, index, 0);
+    TabPoints_triSelonT0(ptrT);
+   /* PilePoints_init(ptrP);
+    PilePoints_empile(ptrP, TabPoints_get(ptrT, 0));
+    PilePoints_empile(ptrP, TabPoints_get(ptrT, 1));
+
+    for (int i = 2; i < TabPoints_nb(ptrT); ++i) {
+        while (!estAGauche(PilePoints_deuxiemeSommet(ptrP), PilePoints_sommet(ptrP), TabPoints_get(ptrT, i))) {
+            PilePoints_depile(ptrP);
+        }
+        PilePoints_empile(ptrP, TabPoints_get(ptrT, i));
+    }
+
+    cairo_t *cr = gdk_cairo_create(widget->window);
+    for (int i = 1; i < PilePoints_nb(ptrP); ++i) {
+        Point a = point2DrawingArea(PilePoints_sommet(ptrP), pCtxt);
+        Point b = point2DrawingArea(PilePoints_deuxiemeSommet(ptrP), pCtxt);
+        PilePoints_depile(ptrP);
+        drawLine(cr, a, b);
+    }
+    cairo_destroy(cr);*/
 
     return TRUE;
 }

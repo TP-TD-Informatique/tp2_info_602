@@ -2,6 +2,7 @@
 #define _POINTS_H_
 
 #include <math.h>
+#include <stdio.h>
 
 typedef struct SPoint {
     double x;
@@ -79,5 +80,22 @@ int TabPoints_indexBasGauche(TabPoints *tab);
  * @param tab un pointeur vers une structure TabPoint valide
  */
 void TabPoints_triSelonT0(TabPoints *tab);
+
+/**
+ * Echange les points i et j dans le tableau de point
+ * @param tab un pointeur vers une structure TabPoint valide
+ * @param i l'index du premier point
+ * @param j l'index du second point
+ */
+void TabPoints_echange(TabPoints *tab, int i, int j);
+
+/**
+ * Renvoie 1 si a est à gauche de b par rapport à r
+ * @param a un Point
+ * @param b un autre Point
+ * @param r le Point de référence
+ * @return 1|0
+ */
+int estAGauche(Point a, Point b, Point r);
 
 #endif
