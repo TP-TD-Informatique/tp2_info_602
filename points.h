@@ -98,4 +98,12 @@ void TabPoints_echange(TabPoints *tab, int i, int j);
  */
 int estAGauche(Point a, Point b, Point r);
 
+/**
+ * Retourne l'angle en radians entre a et r
+ * @param a un Point
+ * @param r un autre Point
+ * @return un angle en radians
+ */
+double angle(Point *a, Point *r);
+
 #endif

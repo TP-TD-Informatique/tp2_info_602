@@ -57,12 +57,6 @@ int TabPoints_indexBasGauche(TabPoints *tab) {
     return res;
 }
 
-/**
- * Retourne l'angle en radians entre a et r
- * @param a un Point
- * @param r un autre Point
- * @return un angle en radians
- */
 double angle(Point *a, Point *r) {
     return atan2(a->y - r->y, a->x - r->x);
 }

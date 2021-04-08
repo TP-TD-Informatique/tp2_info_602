@@ -1,5 +1,8 @@
 # TP2 Algorithmique
 
+- Kevin Traini
+- Jules Geyer
+
 ## Question 3.5 : Nombre de points et temps d'exécution
 
 ### Nb de sommet en fonction du nombre de points (*disque*) + temps :
@@ -23,3 +26,7 @@
 |  1.000 | 19,15,20,17,15 = 17.2 | 3.7,0.8,0.7,3.5,3.7 = 2.48 | 
 |  2.000 | 21,18,21,26,20 = 21.2 | 5.7,5.8,5.9,7.4,5.4 = 6.04 | 
 |  5.000 | 23,24,25,23,29 = 24.8 | 7.9,8.3,8.1,6.2,8.2 = 7.74 | 
+
+## Question 4
+
+L'algorithme de Jarvis a commencé à être implémenté, mais il n'est pas fini (il boucle).

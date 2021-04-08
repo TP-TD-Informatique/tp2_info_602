@@ -50,6 +50,11 @@ gboolean losangeRandom(GtkWidget *widget, gpointer data);
 gboolean graham(GtkWidget *widget, gpointer data);
 
 /**
+ * Effectue l'algorithme de jarvis sur les points
+ */
+gboolean jarvis(GtkWidget *widget, gpointer data);
+
+/**
     Cette réaction est appelée à la création de la zone de dessin.
 */
 gboolean realize_evt_reaction(GtkWidget *widget, gpointer data);
@@ -121,7 +126,7 @@ gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer 
     // Affiche tous les points en bleu.
     cairo_set_source_rgb(cr, 1, 0, 0);
     for (int i = 0; i < TabPoints_nb(ptrT) - 1; ++i) {
-        if (!PilePoints_estVide(ptrP)) {
+        if (PilePoints_estVide(ptrP)) {
             cairo_set_source_rgb(cr, 0, 0, 1);
             drawLine(cr, point2DrawingArea(TabPoints_get(ptrT, i), pCtxt),
                      point2DrawingArea(TabPoints_get(ptrT, i + 1), pCtxt));
@@ -179,6 +184,7 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     GtkWidget *button_disk_random;
     GtkWidget *button_losange_random;
     GtkWidget *button_graham;
+    GtkWidget *button_jarvis;
 
     /* Crée une fenêtre. */
     window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -229,6 +235,12 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     g_signal_connect(button_graham, "clicked",
                      G_CALLBACK(graham),
                      pCtxt);
+    // Créé le bouton jarvis
+    button_jarvis = gtk_button_new_with_label("Enveloppe convexe (Jarvis)");
+    // Connecte la réaction jarvis à l'évenement 'click'
+    g_signal_connect(button_jarvis, "clicked",
+                     G_CALLBACK(jarvis),
+                     pCtxt);
     // Ajoute les éléments à la vue
     gtk_container_add(GTK_CONTAINER(vbox2), button_disk_random);
     gtk_container_add(GTK_CONTAINER(vbox2), button_losange_random);
@@ -237,6 +249,7 @@ GtkWidget *creerIHM(Contexte *pCtxt) {
     gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->sommet_label);
     gtk_container_add(GTK_CONTAINER(vbox2), pCtxt->time_label);
     gtk_container_add(GTK_CONTAINER(vbox2), button_graham);
+    gtk_container_add(GTK_CONTAINER(vbox2), button_jarvis);
     // Crée le bouton quitter.
     button_quit = gtk_button_new_with_label("Quitter");
     // Connecte la réaction gtk_main_quit à l'événement "clic" sur ce bouton.
@@ -343,6 +356,42 @@ gboolean graham(GtkWidget *widget, gpointer data) {
     char nb2[100];
     sprintf(nb2, "%lf ms", t);
     gtk_label_set_text(GTK_LABEL(pCtxt->time_label), nb2);
+
+    gtk_widget_queue_draw(pCtxt->drawing_area);
+
+    return TRUE;
+}
+
+gboolean jarvis(GtkWidget *widget, gpointer data) {
+    Contexte *pCtxt = (Contexte *) data;
+    TabPoints *ptrT = &(pCtxt->P);
+    PilePoints *ptrP = &(pCtxt->pile);
+
+    printf("Jarvis\n");
+
+    int index = TabPoints_indexBasGauche(ptrT);
+    Point point0 = TabPoints_get(ptrT, index);
+    Point pointA = point0;
+    PilePoints_init(ptrP);
+    do {
+        PilePoints_empile(ptrP, pointA);
+
+        int minI = 0;
+        Point p = TabPoints_get(ptrT, minI);
+        double minA = angle(&point0, &p);
+        for (int i = 1; i < TabPoints_nb(ptrT); ++i) {
+            p = TabPoints_get(ptrT, i);
+            if (p.x != pointA.x && p.y != pointA.y) {
+                double a = angle(&point0, &p);
+                if (a < minA) {
+                    minA = a;
+                    minI = i;
+                }
+            }
+        }
+        pointA = TabPoints_get(ptrT, minI);
+        printf("%d\n", PilePoints_nb(ptrP));
+    } while (pointA.x != point0.x && pointA.y != point0.y);
 
     gtk_widget_queue_draw(pCtxt->drawing_area);
 
