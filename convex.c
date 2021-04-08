@@ -85,6 +85,7 @@ void drawLine(cairo_t *cr, Point p, Point q);
 // Programme principal
 //-----------------------------------------------------------------------------
 int main(int argc, char *argv[]) {
+    srand(time(NULL));
     Contexte context;
     TabPoints_init(&context.P);
 
@@ -107,7 +108,8 @@ gboolean realize_evt_reaction(GtkWidget *widget, gpointer data) { // force un é
 // c'est la réaction principale qui va redessiner tout.
 gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer data) {
     Contexte *pCtxt = (Contexte *) data;
-    TabPoints *ptrP = &(pCtxt->P);
+    TabPoints *ptrT = &(pCtxt->P);
+    PilePoints *ptrP = &(pCtxt->pile);
     // c'est la structure qui permet d'afficher dans une zone de dessin
     // via Cairo
     cairo_t *cr = gdk_cairo_create(widget->window);
@@ -115,9 +117,31 @@ gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer 
     cairo_paint(cr); // remplit tout dans la couleur choisie.
 
     // Affiche tous les points en bleu.
-    cairo_set_source_rgb(cr, 0, 0, 1);
-    for (int i = 0; i < TabPoints_nb(ptrP); ++i)
-        drawPoint(cr, point2DrawingArea(TabPoints_get(ptrP, i), pCtxt));
+    cairo_set_source_rgb(cr, 1, 0, 0);
+    for (int i = 0; i < TabPoints_nb(ptrT) - 1; ++i) {
+        if (!PilePoints_estVide(ptrP)) {
+            cairo_set_source_rgb(cr, 0, 0, 1);
+            drawLine(cr, point2DrawingArea(TabPoints_get(ptrT, i), pCtxt),
+                     point2DrawingArea(TabPoints_get(ptrT, i + 1), pCtxt));
+            cairo_set_source_rgb(cr, 1, 0, 0);
+        }
+        drawPoint(cr, point2DrawingArea(TabPoints_get(ptrT, i), pCtxt));
+    }
+
+    if (!PilePoints_estVide(ptrP)) {
+        cairo_set_source_rgb(cr, 0, 1, 0);
+        Point a = point2DrawingArea(PilePoints_sommet(ptrP), pCtxt);
+        Point r = a;
+        PilePoints_depile(ptrP);
+        while (!PilePoints_estVide(ptrP)) {
+            Point b = point2DrawingArea(PilePoints_sommet(ptrP), pCtxt);
+            drawLine(cr, a, b);
+
+            PilePoints_depile(ptrP);
+            a = b;
+        }
+        drawLine(cr, a, r);
+    }
 
     // On a fini, on peut détruire la structure.
     cairo_destroy(cr);
@@ -285,7 +309,9 @@ gboolean graham(GtkWidget *widget, gpointer data) {
     int index = TabPoints_indexBasGauche(ptrT);
     TabPoints_echange(ptrT, index, 0);
     TabPoints_triSelonT0(ptrT);
-   /* PilePoints_init(ptrP);
+
+
+    PilePoints_init(ptrP);
     PilePoints_empile(ptrP, TabPoints_get(ptrT, 0));
     PilePoints_empile(ptrP, TabPoints_get(ptrT, 1));
 
@@ -296,14 +322,9 @@ gboolean graham(GtkWidget *widget, gpointer data) {
         PilePoints_empile(ptrP, TabPoints_get(ptrT, i));
     }
 
-    cairo_t *cr = gdk_cairo_create(widget->window);
-    for (int i = 1; i < PilePoints_nb(ptrP); ++i) {
-        Point a = point2DrawingArea(PilePoints_sommet(ptrP), pCtxt);
-        Point b = point2DrawingArea(PilePoints_deuxiemeSommet(ptrP), pCtxt);
-        PilePoints_depile(ptrP);
-        drawLine(cr, a, b);
-    }
-    cairo_destroy(cr);*/
+    printf("taille pile %d\n", ptrP->nb);
+
+    gtk_widget_queue_draw(pCtxt->drawing_area);
 
     return TRUE;
 }

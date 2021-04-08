@@ -24,12 +24,12 @@ void PilePoints_depile(PilePoints *pile) {
 
 Point PilePoints_sommet(PilePoints *pile) {
     assert(pile->nb > 0);
-    return pile->points[pile->nb];
+    return pile->points[pile->nb - 1];
 }
 
 Point PilePoints_deuxiemeSommet(PilePoints *pile) {
     assert(pile->nb > 1);
-    return pile->points[pile->nb - 1];
+    return pile->points[pile->nb - 2];
 }
 
 void PilePoints_agrandir(PilePoints *pile) {

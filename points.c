@@ -38,7 +38,7 @@ void TabPoints_termine(TabPoints *tab) {
 
 void TabPoints_agrandir(TabPoints *tab) {
     tab->taille += 100;
-    tab->points = realloc(tab->points, sizeof(Point) * tab->taille);
+    tab->points = (Point *) realloc(tab->points, sizeof(Point) * tab->taille);
 }
 
 int TabPoints_indexBasGauche(TabPoints *tab) {
@@ -49,7 +49,7 @@ int TabPoints_indexBasGauche(TabPoints *tab) {
         Point a = TabPoints_get(tab, i); // Point actuel
 
         // Si a est sous m ou si a est au même niveau que m et plus à gauche
-        if (a.y > m.y || (a.y == m.y && a.x < m.x)) {
+        if (a.y < m.y || (a.y == m.y && a.x < m.x)) {
             res = i;
         }
     }
@@ -58,19 +58,13 @@ int TabPoints_indexBasGauche(TabPoints *tab) {
 }
 
 /**
- * Calcule l'angle polaire de b par rapport à a
+ * Retourne l'angle en radians entre a et r
  * @param a un Point
- * @param b un autre Point
- * @return l'angle entre les 2 points
+ * @param r un autre Point
+ * @return un angle en radians
  */
-double anglePolaire(Point *a, Point *b) {
-    double longueur = b->x - a->x;
-    double hauteur = b->y - a->y;
-
-    double adj = longueur;
-    double hyp = sqrt((longueur * longueur) + (hauteur * hauteur));
-
-    return acos(adj / hyp);
+double angle(Point *a, Point *r) {
+    return atan2(a->y - r->y, a->x - r->x);
 }
 
 /**
@@ -87,8 +81,8 @@ int comp(const void *a, const void *b, const void *r) {
     Point *pb = (Point *) b;
     Point *pr = (Point *) r;
 
-    double angleA = anglePolaire(pr, pa);
-    double angleB = anglePolaire(pr, pb);
+    double angleA = angle(pa, pr);
+    double angleB = angle(pb, pr);
 
     if (angleA == angleB) {
         return 0;
@@ -100,7 +94,7 @@ int comp(const void *a, const void *b, const void *r) {
 }
 
 void TabPoints_triSelonT0(TabPoints *tab) {
-    qsort_r(tab->points, tab->nb, sizeof(Point), comp, tab->points[0]);
+    qsort_r(tab->points + 1, tab->nb - 1, sizeof(Point), comp, &(tab->points[0]));
 }
 
 void TabPoints_echange(TabPoints *tab, int i, int j) {
@@ -110,5 +104,5 @@ void TabPoints_echange(TabPoints *tab, int i, int j) {
 }
 
 int estAGauche(Point a, Point b, Point r) {
-    return comp(&a, &b, &r) > 0;
+    return comp(&a, &b, &r) < 0;
 }
