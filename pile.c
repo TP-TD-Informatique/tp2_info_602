@@ -18,8 +18,8 @@ void PilePoints_empile(PilePoints *pile, Point p) {
 }
 
 void PilePoints_depile(PilePoints *pile) {
-    if (pile->nb > 0)
-        pile->nb--;
+    assert(pile->nb > 0);
+    pile->nb--;
 }
 
 Point PilePoints_sommet(PilePoints *pile) {

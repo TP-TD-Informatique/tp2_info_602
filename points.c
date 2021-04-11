@@ -16,12 +16,12 @@ void TabPoints_ajoute(TabPoints *tab, Point p) {
 }
 
 void TabPoints_set(TabPoints *tab, int i, Point p) {
-    assert (i < tab->nb);
+    assert(i < tab->nb);
     tab->points[i] = p;
 }
 
 Point TabPoints_get(TabPoints *tab, int i) {
-    assert (i < tab->nb);
+    assert(i < tab->nb);
     return tab->points[i];
 }
 

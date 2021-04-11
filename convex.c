@@ -123,7 +123,7 @@ gboolean expose_evt_reaction(GtkWidget *widget, GdkEventExpose *event, gpointer 
     cairo_set_source_rgb(cr, 1, 1, 1); // choisit le blanc.
     cairo_paint(cr); // remplit tout dans la couleur choisie.
 
-    // Affiche tous les points en bleu.
+    // Affiche tous les points en rouge.
     cairo_set_source_rgb(cr, 1, 0, 0);
     for (int i = 0; i < TabPoints_nb(ptrT) - 1; ++i) {
         if (PilePoints_estVide(ptrP)) {
@@ -332,7 +332,6 @@ gboolean graham(GtkWidget *widget, gpointer data) {
     int index = TabPoints_indexBasGauche(ptrT);
     TabPoints_echange(ptrT, index, 0);
     TabPoints_triSelonT0(ptrT);
-
 
     PilePoints_init(ptrP);
     PilePoints_empile(ptrP, TabPoints_get(ptrT, 0));
